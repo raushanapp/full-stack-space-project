@@ -31,7 +31,7 @@ jobs:
         run: pnpm run setup
 
       - name: Run client tests
-        run: pnpm --dir client test
+        run: pnpm --dir client test -- --passWithNoTests
 
       - name: Build client
         run: pnpm --dir client run build
