@@ -1,26 +1,34 @@
-name :Full-STACK SPACE Project CI
-on : 
-  push : 
-    branches : [ main ]
-  pull_request:
-    branches : [ main ]
-jobs : 
-    build :
-     runs-on : ubuntu-latest
-     steps:
-       - name: Checkout code
-         uses: actions/checkout@v3
-       - name: Setup Node.js 20
-         uses: actions/setup-node@v3
-         with:
-           node-version: "20"
-       - name: Install dependencies
-         run: pnpm install
-       - name: Run tests
-         run: pnpm test
-       - name: Build client
-         run: pnpm --dir client run build
-    # deploy : 
-    #  needs : build
+name: Full-STACK SPACE Project CI
 
-   
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js 20
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 11
+
+      - name: Install dependencies
+        run: pnpm run setup
+
+      - name: Run tests
+        run: pnpm test
+
+      - name: Build client
+        run: pnpm --dir client run build
