@@ -21,8 +21,6 @@ describe("Launches API", () => {
         .get("/v1/launches")
         .expect("Content-Type", /json/)
         .expect(200);
-
-      expect(response.statusCode).toBe(200);
     });
   });
 
