@@ -3,10 +3,12 @@ const { deepStrictEqual } = require("node:assert");
 const request = require("supertest");
 const app = require("../../app");
 const { mongoConnect, mongoDisconnect } = require("../../services/mongo");
+const { loadPlanetsData } = require("../../models/planets.model");
 
 describe("Launches API", () => {
   before(async () => {
     await mongoConnect();
+    await loadPlanetsData();
   });
 
   after(async () => {
