@@ -30,8 +30,8 @@ jobs:
       - name: Install dependencies
         run: pnpm run setup
 
-      - name: Run tests
-        run: pnpm test
+      - name: Run client tests
+        run: pnpm --dir client test
 
       - name: Build client
         run: pnpm --dir client run build
