@@ -10,10 +10,9 @@ jobs:
   build:
     env:
       CI: true
-
-    strategy: 
-     matrix:
-     node-version:[22.x,24.x]
+    strategy:
+      matrix:
+        node-version: [22.x, 24.x]
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
