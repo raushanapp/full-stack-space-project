@@ -29,7 +29,7 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: ${{ matrix.node-version }}
-          cache: pnpm
+          # cache: pnpm
 
       - name: Use  MongoDB from Github actions
         uses: supercharge/mongodb-github-action@1.12.1
