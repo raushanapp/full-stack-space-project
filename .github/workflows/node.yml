@@ -10,9 +10,11 @@ jobs:
   build:
     env:
       CI: true
+      MONGO_URL: mongodb://localhost/space-nasa-api
     strategy:
       matrix:
         node-version: [22.x, 24.x]
+        mongodb-version: [8.x]
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
@@ -28,6 +30,11 @@ jobs:
         with:
           node-version: ${{ matrix.node-version }}
           cache: pnpm
+
+      - name: Use  MongoDB from Github actions
+        uses: supercharge/mongodb-github-action@1.12.1
+        with:
+          mongodb-version: ${{ matrix.mongodb-version }}
       - name: Check versions
         run: |
           node --version
