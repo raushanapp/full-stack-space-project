@@ -10,11 +10,11 @@ jobs:
   build:
     env:
       CI: true
-      MONGO_URL: mongodb://localhost/space-nasa-api
+      MONGODB_URL: mongodb://localhost:27017/space-nasa-api
     strategy:
       matrix:
         node-version: [22.x, 24.x]
-        mongodb-version: ["8.3"]
+        mongodb-version: [6.x, 8.x]
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
