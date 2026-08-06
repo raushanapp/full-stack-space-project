@@ -1,7 +1,13 @@
-allowBuilds:
-  unrs-resolver: true
+# allowBuilds:
+#   unrs-resolver: true
 
 # allowBuilds:
 #   unrs-resolver: set this to true or false
 # onlyBuiltDependencies:
 #   - unrs-resolver
+
+allowBuilds:
+  unrs-resolver: true
+  core-js-pure: true
+  core-js: true
+  jss: true
