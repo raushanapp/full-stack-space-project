@@ -120,29 +120,22 @@ git clone <repository-url>
 cd full-stack-space-project
 ```
 
-### Step 2: Create Environment Variables
+### Step 2: Configure Environment Variables
 
-Create a `.env` file in the `server` directory with the following variables:
+Create a `.env` file in the `server` directory:
 
 ```bash
 cd server
 touch .env
 ```
 
-Add these environment variables to `server/.env`:
+**⚠️ Security Note**: Configure the following variables securely in your `.env` file. Do NOT commit this file to version control. Add it to `.gitignore`:
 
-```env
-# MongoDB Connection
-MONGO_URL=mongodb://localhost:27017/spaceLaunch
-# or for MongoDB Atlas:
-# MONGO_URL=mongodb+srv://username:password@cluster.mongodb.net/spaceLaunch?retryWrites=true&w=majority
+- `MONGO_URL`: Database connection string (keep credentials private)
+- `PORT`: Server port configuration
+- `NODE_ENV`: Set to `development` or `production`
 
-# Server Port
-PORT=8000
-
-# Node Environment
-NODE_ENV=development
-```
+**Never share or commit sensitive environment variables in your repository.**
 
 ### Step 3: Install Dependencies
 
@@ -171,12 +164,9 @@ Run both client and server simultaneously:
 pnpm run watch
 ```
 
-This command will:
+This command will start both the backend server and React development server.
 
-- Start the backend server on `http://localhost:8000`
-- Start the React development server on `http://localhost:3000`
-
-**Access the application**: Open your browser and navigate to `http://localhost:3000`
+**Access the application**: Open your browser to access the running application (check console output for the correct address).
 
 ### Running Client and Server Separately
 
@@ -271,9 +261,9 @@ The backend follows a **three-tier architecture pattern** with clear separation 
 
 ```mermaid
 graph TB
-    Client["🖥️ React Client<br/>(Port 3000)"]
+    Client["🖥️ React Client<br/>(Frontend)"]
 
-    subgraph "Express Server (Port 8000)"
+    subgraph "Express Server"
         Router["Router Layer<br/>(api.js)<br/>Routes requests"]
         Controller["Controller Layer<br/>(launches.controller.js<br/>planets.controller.js)<br/>Request handlers"]
         Service["Service Layer<br/>(Business Logic)<br/>mongo.js, query.js"]
@@ -498,44 +488,49 @@ graph TB
 
 ## 🔌 API Endpoints
 
+The application provides RESTful API endpoints for managing missions and planets:
+
 ### Planets
 
 - **GET** `/v1/planets` - Get all habitable planets
-  ```bash
-  curl http://localhost:8000/v1/planets
-  ```
+- **GET** `/v1/planets/:id` - Get specific planet details
 
 ### Launches
 
-- **GET** `/v1/launches` - Get all launches
+- **GET** `/v1/launches` - Get all scheduled launches
 - **GET** `/v1/launches?limit=X&skip=X` - Get paginated launches
-- **POST** `/v1/launches` - Schedule a new launch
-  ```bash
-  curl -X POST http://localhost:8000/v1/launches \
-    -H "Content-Type: application/json" \
-    -d '{
-      "mission": "Operation Z",
-      "rocket": "Falcon 9",
-      "target": "Kepler-452 b",
-      "launchDate": "2026-12-25"
-    }'
-  ```
+- **POST** `/v1/launches` - Schedule a new mission
+  - Required fields: mission, rocket, target, launchDate
 - **DELETE** `/v1/launches/:id` - Cancel a scheduled launch
+
+**Note**: For API testing and documentation, refer to your local development environment after starting the application.
 
 ## 🔐 Environment Variables
 
-The backend requires a `.env` file in the `server` directory. Here's what's needed:
+**Security Best Practices:**
 
-| Variable    | Description                          | Example                                 |
-| ----------- | ------------------------------------ | --------------------------------------- |
-| `MONGO_URL` | MongoDB connection string            | `mongodb://localhost:27017/spaceLaunch` |
-| `PORT`      | Server port                          | `8000`                                  |
-| `NODE_ENV`  | Environment (development/production) | `development`                           |
+- Store all sensitive configuration in `.env` files
+- Never commit `.env` files to version control
+- Use environment-specific configurations for development and production
+- Rotate credentials regularly
+- Use strong, unique database passwords
+- Enable authentication and encryption for database connections
 
-**MongoDB Connection Examples:**
+**Required Configuration Variables:**
 
-- **Local**: `mongodb://localhost:27017/spaceLaunch`
-- **MongoDB Atlas**: `mongodb+srv://username:password@cluster.mongodb.net/spaceLaunch?retryWrites=true&w=majority`
+| Variable    | Description                          | Security Notes                                             |
+| ----------- | ------------------------------------ | ---------------------------------------------------------- |
+| `MONGO_URL` | Database connection string           | Keep credentials private; use secure connections (SSL/TLS) |
+| `PORT`      | Server port configuration            | Use non-standard ports in production                       |
+| `NODE_ENV`  | Environment (development/production) | Never expose this publicly                                 |
+
+**Setup Instructions:**
+
+1. Create `.env` in the `server` directory
+2. Configure database credentials securely
+3. Add `.env` to `.gitignore` to prevent accidental commits
+4. Use a secure password manager for credential storage
+5. Implement proper access controls and authentication
 
 ## 🐳 Docker Support
 
@@ -548,17 +543,26 @@ docker build -t space-launch-app .
 ### Run Docker Container
 
 ```bash
-docker run -p 8000:8000 \
-  -e MONGO_URL=mongodb://host.docker.internal:27017/spaceLaunch \
+docker run -p <port>:<port> \
+  --env-file=.env \
   space-launch-app
 ```
 
+**Security Recommendations for Docker:**
+
+- Use `--env-file=.env` to securely load environment variables (keep `.env` out of repository)
+- Never pass sensitive credentials as command-line arguments
+- Use Docker secrets for production deployments
+- Run container with non-root user privileges
+- Implement network isolation and access controls
+- Regularly update base images and dependencies
+
 The Dockerfile:
 
-- Uses Node.js LTS Alpine image (lightweight)
-- Installs pnpm
+- Uses Node.js LTS Alpine image (lightweight and secure)
+- Installs pnpm for dependency management
 - Builds the React frontend
-- Serves the app on port 8000
+- Runs with minimal privileges (non-root user)
 
 ## 📝 Available Scripts
 
@@ -668,20 +672,21 @@ The project uses:
 
 ## 🔧 Troubleshooting
 
-### MongoDB Connection Issues
+### Database Connection Issues
 
-- Ensure MongoDB is running locally or MongoDB Atlas is accessible
-- Check that `MONGO_URL` in `.env` is correct
-- Verify network connectivity for MongoDB Atlas
+- Ensure your database is running and accessible
+- Verify that `MONGO_URL` in `.env` is correctly configured
+- Check network connectivity and firewall settings
+- Use strong authentication credentials
+- Enable SSL/TLS for remote connections
 
 ### Port Already in Use
 
 ```bash
-# Kill process on port 3000 (frontend)
-lsof -ti:3000 | xargs kill -9
+# Kill process on specific port (replace PORT with your port number)
+lsof -ti:PORT | xargs kill -9
 
-# Kill process on port 8000 (backend)
-lsof -ti:8000 | xargs kill -9
+# Or use a different port in your .env configuration
 ```
 
 ### Dependencies Installation Issues
@@ -694,10 +699,12 @@ pnpm store prune
 pnpm run setup
 ```
 
-### CORS Errors
+### Server Connection Issues
 
-- Ensure frontend is running on `http://localhost:3000`
-- Backend CORS is configured to accept requests from `localhost:3000`
+- Verify the backend server is running
+- Check console output for the actual server address
+- Ensure your frontend and backend are properly configured to communicate
+- Check network isolation and firewall settings
 
 ## 📄 License
 
@@ -720,7 +727,64 @@ tail -f /path/to/logs
 ps aux | grep node
 ```
 
-## 🚀 Deployment
+## �️ Security
+
+This project implements security best practices to protect sensitive data and systems:
+
+### Key Security Features
+
+- **Environment Variables**: Sensitive configuration stored securely, never committed to repository
+- **CORS Protection**: Cross-origin requests are validated and controlled
+- **Input Validation**: All user inputs are validated before processing
+- **MongoDB Authentication**: Database requires credentials for access
+- **Request Logging**: All requests are logged for audit trails
+- **Error Handling**: Generic error messages to prevent information disclosure
+- **Non-root Docker**: Container runs with limited user privileges
+
+### Security Recommendations
+
+**For Development:**
+
+- Use `.env` files for local configuration
+- Never commit credentials to Git
+- Keep dependencies updated: `pnpm update`
+- Use HTTPS for local development if possible
+- Implement rate limiting for API endpoints
+- Enable request validation and sanitization
+
+**For Production:**
+
+- Use a secrets management system (AWS Secrets Manager, HashiCorp Vault, etc.)
+- Enable HTTPS/TLS for all connections
+- Implement database encryption at rest and in transit
+- Use strong, unique passwords for all accounts
+- Implement authentication and authorization mechanisms
+- Set up regular security audits and penetration testing
+- Monitor logs and set up alerts for suspicious activity
+- Use a firewall and implement network segmentation
+- Keep all dependencies and systems updated
+- Enable database backups and test recovery procedures
+
+**Database Security:**
+
+- Always use encrypted connections (SSL/TLS)
+- Enable authentication and strong passwords
+- Restrict database access by IP/network
+- Use principle of least privilege for database users
+- Enable audit logging for database operations
+- Implement regular backup and disaster recovery plans
+
+**Deployment Security:**
+
+- Use environment-specific configuration
+- Implement proper access controls
+- Use Docker secrets or external secret management
+- Enable vulnerability scanning in CI/CD pipeline
+- Implement automated security testing
+- Use version control for infrastructure code
+- Monitor and alert on security events
+
+## �🚀 Deployment
 
 ### Production Deployment Steps
 
@@ -730,17 +794,21 @@ ps aux | grep node
    pnpm run deploy
    ```
 
-2. **Set Environment Variables**
-   - Configure `MONGO_URL` pointing to production MongoDB
+2. **Configure Environment Variables Securely**
+   - Set `MONGO_URL` with secure database credentials
    - Set `NODE_ENV=production`
-   - Set `PORT` (usually 8000)
+   - Configure appropriate `PORT` value
+   - Use environment-specific configuration files
+   - Never commit credentials to version control
+   - Use secure secrets management tools
 
-3. **Using Docker**
+3. **Using Docker (Recommended)**
 
    ```bash
    docker build -t space-launch:latest .
-   docker run -d -p 8000:8000 \
-     -e MONGO_URL=your_production_mongo_url \
+   docker run -d \
+     -p <port>:<port> \
+     --env-file=.env \
      space-launch:latest
    ```
 
@@ -748,6 +816,17 @@ ps aux | grep node
    ```bash
    pnpm run deploy-cluster
    ```
+
+**Security Checklist:**
+
+- [ ] Environment variables are securely configured
+- [ ] `.env` file is in `.gitignore` and NOT in repository
+- [ ] Database has strong authentication enabled
+- [ ] HTTPS/TLS encryption is enabled
+- [ ] Firewall rules are properly configured
+- [ ] Regular security updates are applied
+- [ ] Database backups are configured
+- [ ] Access logs and monitoring are enabled
 
 ## 📞 Support
 
