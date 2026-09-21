@@ -13,18 +13,6 @@ function isHabitablePlanet(planet) {
   );
 }
 
-/*
-  const promise = new Promise((resolve, reject) => {
-    resolve(42)
-    
-    })
-  promise.then((result)=>{
-    
-  })
-    const result = await promise;
-    console.log(result);
-*/
-
 function loadPlanetsData() {
   return new Promise((resolve, reject) => {
     fs.createReadStream(
@@ -46,9 +34,14 @@ function loadPlanetsData() {
         reject(err);
       })
       .on("end", async () => {
-        const countPlanetsFound = (await getAllPlanets()).length;
-        console.log(`${countPlanetsFound} habitable planets found.`);
-        resolve();
+        try {
+          const countPlanetsFound = (await getAllPlanets()).length;
+          console.log(`${countPlanetsFound} habitable planets found.`);
+          resolve();
+        } catch (error) {
+          console.error("Error loading planet data:", error);
+          reject(error);
+        }
       });
   });
 }

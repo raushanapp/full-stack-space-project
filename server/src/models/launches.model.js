@@ -40,7 +40,7 @@ async function populateLaunches() {
         ],
       },
     });
-
+    console.log("SPACE X API RESPONSE RECEIVED===>>>", response);
     if (response.status !== 200) {
       throw new Error("Launch data download failed");
     }

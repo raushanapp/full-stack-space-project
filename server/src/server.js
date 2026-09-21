@@ -14,10 +14,14 @@ const server = http.createServer(app);
 async function startServer() {
   // Connect to MongoDB
   await mongoConnect();
-
+  //  Load planets data
   await loadPlanetsData();
   //  launches Data
-  await loadLaunchData();
+  try {
+    await loadLaunchData();
+  } catch (error) {
+    console.error("Error loading launch data:", error);
+  }
 
   server.listen(PORT, () => {
     console.log(`Server is running on port ${PORT}......`);
