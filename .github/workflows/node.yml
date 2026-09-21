@@ -13,7 +13,7 @@ jobs:
       MONGODB_URL: mongodb://localhost:27017/space-nasa-api
     strategy:
       matrix:
-        node-version: [22.x, 24.x]
+        node-version: [24.x, 26.x]
         mongodb-version: [8.3]
     runs-on: ubuntu-latest
     steps:
