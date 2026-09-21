@@ -4,9 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "install-server": "pnpm --dir server install",
-    "install-client": "pnpm --dir client install",
-    "setup": "pnpm run install-server && pnpm run install-client",
+    "setup": "pnpm install",
     "server": "pnpm --dir server run watch",
     "client": "pnpm --dir client run start",
     "watch": "pnpm run server & pnpm run client",
